@@ -14,5 +14,10 @@ pipeline {
                 bat 'mvn clean package -DskipTests'
             }
         }
+        stage('Docker Build') {
+            steps {
+                bat 'docker build -t track-activity-backend .'
+            }
+        }
     }
 }
