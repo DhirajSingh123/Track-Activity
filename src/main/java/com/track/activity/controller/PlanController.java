@@ -33,4 +33,10 @@ public class PlanController {
                 planService.getPlan(planId)
         );
     }
+
+    @GetMapping("/test")
+    public String test() {
+
+        return "hello";
+    }
 }
