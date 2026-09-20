@@ -21,6 +21,32 @@ pipeline {
             }
         }
 
+        stage('Docker Build') {
+            steps {
+                bat 'docker build -t track-activity-backend .'
+            }
+        }
+
+// 👇 YE NAYA ADD KARO
+        stage('Push to ECR') {
+            steps {
+                withCredentials([
+                        string(credentialsId: 'AWS_ACCESS_KEY_ID',
+                                variable: 'AWS_ACCESS_KEY_ID'),
+                        string(credentialsId: 'AWS_SECRET_ACCESS_KEY',
+                                variable: 'AWS_SECRET_ACCESS_KEY')
+                ]) {
+                    bat '''
+                aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 331191957836.dkr.ecr.ap-south-1.amazonaws.com
+
+                docker tag track-activity-backend:latest 331191957836.dkr.ecr.ap-south-1.amazonaws.com/track-activity-backend:latest
+
+                docker push 331191957836.dkr.ecr.ap-south-1.amazonaws.com/track-activity-backend:latest
+            '''
+                }
+            }
+        }
+
         stage('Deploy') {
             steps {
                 withCredentials([
