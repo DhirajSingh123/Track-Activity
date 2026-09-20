@@ -40,6 +40,25 @@ pipeline {
             }
         }
 
+        stage('Test SSM') {
+            steps {
+                withCredentials([
+                        string(credentialsId: 'AWS_ACCESS_KEY_ID',
+                                variable: 'AWS_ACCESS_KEY_ID'),
+                        string(credentialsId: 'AWS_SECRET_ACCESS_KEY',
+                                variable: 'AWS_SECRET_ACCESS_KEY')
+                ]) {
+                    bat '''
+                aws ssm send-command ^
+                  --instance-ids "i-01fff8561f87d5dad" ^
+                  --document-name "AWS-RunShellScript" ^
+                  --parameters "commands=['echo Jenkins successfully connected to EC2 using SSM']" ^
+                  --region ap-south-1
+            '''
+                }
+            }
+        }
+
         stage('Deploy') {
             steps {
                 withCredentials([
