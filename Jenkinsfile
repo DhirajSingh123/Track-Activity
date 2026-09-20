@@ -27,7 +27,6 @@ pipeline {
             }
         }
 
-// 👇 YE NAYA ADD KARO
         stage('Push to ECR') {
             steps {
                 withCredentials([
