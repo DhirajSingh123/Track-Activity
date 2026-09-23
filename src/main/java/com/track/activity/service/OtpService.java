@@ -57,4 +57,54 @@ public class OtpService {
 
         return otp;
     }
+
+    public User verifyOtp(String phoneNumber, String otp) {
+
+        OtpVerification verification = otpStore.get(phoneNumber);
+
+        // OTP requested hi nahi hua
+        if (verification == null) {
+            throw new IllegalArgumentException(
+                    "OTP not found. Please request a new OTP."
+            );
+        }
+
+        // OTP expired
+        if (Instant.now().toEpochMilli() > verification.getExpiresAt()) {
+            otpStore.remove(phoneNumber);
+
+            throw new IllegalArgumentException(
+                    "OTP expired. Please request a new OTP."
+            );
+        }
+
+        // Wrong OTP
+        if (!verification.getOtp().equals(otp)) {
+
+            verification.setAttempts(
+                    verification.getAttempts() + 1
+            );
+
+            if (verification.getAttempts() >= 3) {
+                otpStore.remove(phoneNumber);
+
+                throw new IllegalArgumentException(
+                        "Too many incorrect attempts. Please request a new OTP."
+                );
+            }
+
+            throw new IllegalArgumentException("Invalid OTP");
+        }
+
+        // Correct OTP - remove it so it cannot be reused
+        otpStore.remove(phoneNumber);
+
+        User user = userRepository.findByPhoneNo(phoneNumber);
+
+        if (user == null) {
+            throw new IllegalArgumentException("User not found");
+        }
+
+        return user;
+    }
 }

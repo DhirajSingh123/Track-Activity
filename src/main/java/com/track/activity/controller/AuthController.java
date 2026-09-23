@@ -1,5 +1,7 @@
 package com.track.activity.controller;
 
+import com.track.activity.dto.VerifyOtpRequest;
+import com.track.activity.model.User;
 import com.track.activity.service.OtpService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,4 +34,17 @@ public class AuthController {
                 )
         );
     }
+
+    @PostMapping("/verify-otp")
+    public ResponseEntity<User> verifyOtp(
+            @RequestBody VerifyOtpRequest request) {
+
+        User user = otpService.verifyOtp(
+                request.getPhoneNumber(),
+                request.getOtp()
+        );
+
+        return ResponseEntity.ok(user);
+    }
+
 }
