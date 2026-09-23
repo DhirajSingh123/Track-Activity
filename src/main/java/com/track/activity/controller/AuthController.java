@@ -1,5 +1,6 @@
 package com.track.activity.controller;
 
+import com.track.activity.dto.SendOtpRequest;
 import com.track.activity.dto.VerifyOtpRequest;
 import com.track.activity.model.User;
 import com.track.activity.service.OtpService;
@@ -20,13 +21,10 @@ public class AuthController {
 
     @PostMapping("/send-otp")
     public ResponseEntity<Map<String, String>> sendOtp(
-            @RequestBody Map<String, String> request) {
+            @RequestBody SendOtpRequest request) {
 
-        String phoneNumber = request.get("phoneNumber");
+        String otp = otpService.sendOtp(request.getPhoneNumber());
 
-        String otp = otpService.sendOtp(phoneNumber);
-
-        // DEV only - later OTP will be sent through SMS
         return ResponseEntity.ok(
                 Map.of(
                         "message", "OTP generated successfully",
