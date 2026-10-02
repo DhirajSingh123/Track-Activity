@@ -5,6 +5,7 @@ import com.track.activity.dto.SendOtpRequest;
 import com.track.activity.dto.VerifyOtpRequest;
 import com.track.activity.model.User;
 import com.track.activity.security.JwtService;
+import com.track.activity.service.EmailService;
 import com.track.activity.service.OtpService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,20 +21,25 @@ public class AuthController {
     @Autowired
     private JwtService jwtService;
 
-    public AuthController(OtpService otpService) {
+    public AuthController(
+            OtpService otpService,
+            JwtService jwtService) {
+
         this.otpService = otpService;
+        this.jwtService = jwtService;
     }
 
     @PostMapping("/send-otp")
     public ResponseEntity<Map<String, String>> sendOtp(
             @RequestBody SendOtpRequest request) {
 
-        String otp = otpService.sendOtp(request.getPhoneNumber());
+
+        otpService.sendOtp(request.getPhoneNumber());
 
         return ResponseEntity.ok(
                 Map.of(
-                        "message", "OTP generated successfully",
-                        "otp", otp
+                        "message",
+                        "OTP sent successfully to registered email"
                 )
         );
     }

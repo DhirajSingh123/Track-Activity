@@ -13,21 +13,28 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class OtpService {
 
+
     private static final long OTP_EXPIRY_SECONDS = 300; // 5 minutes
 
     private final UserRepository userRepository;
+    private final EmailService emailService;
     private final SecureRandom secureRandom = new SecureRandom();
 
     // Temporary DEV storage
     private final Map<String, OtpVerification> otpStore =
             new ConcurrentHashMap<>();
 
-    public OtpService(UserRepository userRepository) {
+    public OtpService(
+            UserRepository userRepository,
+            EmailService emailService) {
+
         this.userRepository = userRepository;
+        this.emailService = emailService;
     }
 
-    public String sendOtp(String phoneNumber) {
+    public void sendOtp(String phoneNumber) {
 
+        // 1. Find registered user
         User user = userRepository.findByPhoneNo(phoneNumber);
 
         if (user == null) {
@@ -36,26 +43,32 @@ public class OtpService {
             );
         }
 
+        // 2. Generate 6-digit OTP
         String otp = String.format(
                 "%06d",
                 secureRandom.nextInt(1_000_000)
         );
 
+        // 3. Create OTP verification object
         OtpVerification verification = new OtpVerification();
 
         verification.setPhoneNumber(phoneNumber);
         verification.setOtp(otp);
         verification.setExpiresAt(
-                Instant.now().plusSeconds(OTP_EXPIRY_SECONDS).toEpochMilli()
+                Instant.now()
+                        .plusSeconds(OTP_EXPIRY_SECONDS)
+                        .toEpochMilli()
         );
         verification.setAttempts(0);
 
+        // 4. Store OTP temporarily
         otpStore.put(phoneNumber, verification);
 
-        // ONLY for development/testing
-        System.out.println("DEV OTP for " + phoneNumber + " = " + otp);
-
-        return otp;
+        // 5. Send OTP to user's registered email
+        emailService.sendOtp(
+                user.getEmailId(),
+                otp
+        );
     }
 
     public User verifyOtp(String phoneNumber, String otp) {
