@@ -49,12 +49,12 @@ pipeline {
                                 variable: 'AWS_SECRET_ACCESS_KEY')
                 ]) {
                     bat '''
-                aws ssm send-command ^
-                  --instance-ids "i-01fff8561f87d5dad" ^
-                  --document-name "AWS-RunShellScript" ^
-                  --comment "Deploy Track Activity Backend" ^
-                  --parameters "commands=['aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 331191957836.dkr.ecr.ap-south-1.amazonaws.com','docker pull 331191957836.dkr.ecr.ap-south-1.amazonaws.com/track-activity-backend:latest','docker rm -f track-activity-backend || true','docker run -d --name track-activity-backend -p 8081:8081 -e AWS_REGION=ap-south-1 331191957836.dkr.ecr.ap-south-1.amazonaws.com/track-activity-backend:latest']" ^
-                  --region ap-south-1
+            aws ssm send-command ^
+              --instance-ids "i-01fff8561f87d5dad" ^
+              --document-name "AWS-RunShellScript" ^
+              --comment "Deploy Track Activity Backend" ^
+              --parameters "commands=['aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 331191957836.dkr.ecr.ap-south-1.amazonaws.com','docker pull 331191957836.dkr.ecr.ap-south-1.amazonaws.com/track-activity-backend:latest','docker rm -f track-activity-backend || true','JWT_SECRET=$(aws ssm get-parameter --name /track-activity/JWT_SECRET --with-decryption --query Parameter.Value --output text --region ap-south-1) && docker run -d --name track-activity-backend -p 8081:8081 -e AWS_REGION=ap-south-1 -e JWT_SECRET=$JWT_SECRET 331191957836.dkr.ecr.ap-south-1.amazonaws.com/track-activity-backend:latest']" ^
+              --region ap-south-1
             '''
                 }
             }
