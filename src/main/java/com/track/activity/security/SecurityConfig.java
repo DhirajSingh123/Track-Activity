@@ -68,7 +68,10 @@ public class SecurityConfig {
                 new CorsConfiguration();
 
         configuration.setAllowedOrigins(
-                List.of("http://localhost:5173")
+                List.of(
+                        "http://localhost:5173",
+                        "http://track-activity-ui-dhiraj.s3-website.ap-south-1.amazonaws.com"
+                )
         );
 
         configuration.setAllowedMethods(
