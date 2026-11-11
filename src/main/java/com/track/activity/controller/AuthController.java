@@ -44,6 +44,11 @@ public class AuthController {
         );
     }
 
+    @PostMapping("/amanUser")
+    public String getName(){
+        return "aman";
+
+    }
     @PostMapping("/verify-otp")
     public ResponseEntity<AuthResponse> verifyOtp(
             @RequestBody VerifyOtpRequest request) {
