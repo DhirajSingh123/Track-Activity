@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/plans")
 public class PlanController {
+    //test
 
     private final PlanService planService;
 
@@ -23,6 +24,11 @@ public class PlanController {
         return ResponseEntity.ok(
                 planService.createPlan(plan)
         );
+    }
+
+    @GetMapping("/aman")
+    public String getPlan() {
+        return "I am aman";
     }
 
     @GetMapping("/{planId}")
